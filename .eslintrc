@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "quotes": ["error", "backtick"],
+    "no-var": "error",
+    "no-console": "warn"
+  }
+}

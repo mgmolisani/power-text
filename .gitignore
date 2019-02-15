@@ -1,0 +1,9 @@
+# Environment
+.env
+
+# Node Modules
+node_modules
+
+# IDE
+.vscode
+.idea
