@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "imap": "^0.8.19"
+    "imap": "^0.8.19",
+    "mailparser": "^2.4.3",
+    "nodemailer": "^5.1.1"
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
