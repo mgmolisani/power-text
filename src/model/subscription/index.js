@@ -1,14 +1,14 @@
 class Subscription {
   constructor() {
-    this._subscriptions = new Set();
+    this.subscribers = new Set();
   }
 
   subscribe(address) {
-    this._subscriptions.add(address);
+    this.subscribers.add(address);
   }
 
   unsubscribe(address) {
-    this._subscriptions.delete(address);
+    this.subscribers.delete(address);
   }
 }
 
