@@ -1,4 +1,4 @@
-const EmailService = require(`../model/email`);
+const emailService = require(`../model/email`);
 const Appliance = require(`../model/appliance`);
 
 const dryer = new Appliance(`LG1`, `Mike's Dryer`, 60000);
@@ -15,11 +15,26 @@ const smtpConfig = {
   port: parseInt(process.env.SMTP_PORT), // 465
   secure: process.env.SMTP_TLS === `true`, // true
 };
-const email = new EmailService(process.env.EMAIL, process.env.PASSWORD, imapConfig, smtpConfig);
 
+const email = emailService(
+  process.env.EMAIL,
+  process.env.PASSWORD,
+  imapConfig,
+  smtpConfig
+);
 
 const controller = {
-  run: () => email.connect(),
+  run: () =>
+    email.readMessages(res => {
+      const { from, attachments } = res;
+
+      attachments.forEach(attachment => {
+        email.sendMessage({
+          to: from.text,
+          text: attachment.content,
+        });
+      });
+    }),
 };
 
 module.exports = controller;

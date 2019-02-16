@@ -1,16 +1,12 @@
-const RecieveService = require(`./receive`);
-const SendService = require(`./send`);
+const recieveService = require(`./receive`);
+const sendService = require(`./send`);
 
-class EmailService {
-  constructor(email, password, receiveConfig, sendConfig) {
-    this._reciever = new RecieveService(email, password, receiveConfig);
-    this._sender = new SendService(email, password, sendConfig);
-    this.connect = this.connect.bind(this);
-  }
+module.exports = (email, password, receiveConfig, sendConfig) => {
+  const receiver = recieveService(email, password, receiveConfig);
+  const sender = sendService(email, password, sendConfig);
 
-  connect() {
-    this._reciever.connect(this._sender.send);
-  }
-}
-
-module.exports = EmailService;
+  return {
+    readMessages: receiver.readMessages,
+    sendMessage: sender.sendMessage,
+  };
+};

@@ -1,27 +1,23 @@
 const nodemailer = require(`nodemailer`);
 
-class SendService {
-  constructor(user, pass, smtpConfig) {
-    this._email = user;
-    this._transporter = nodemailer.createTransport({
-      auth: { user, pass },
-      ...smtpConfig,
-    });
-    this.send = this.send.bind(this);
-  }
+module.exports = (user, pass, smtpConfig) => {
+  const transporter = nodemailer.createTransport({
+    auth: { user, pass },
+    ...smtpConfig,
+  });
 
-  send({ to, subject, text }) {
-    const data = {
-      from: this._email,
-      to,
-      subject,
-      text,
-    };
+  return {
+    sendMessage: ({ to, subject, text }) => {
+      const data = {
+        from: user,
+        to,
+        subject,
+        text,
+      };
 
-    this._transporter.sendMail(data, err => {
-      if (err) throw err;
-    });
-  }
-}
-
-module.exports = SendService;
+      transporter.sendMail(data, err => {
+        if (err) throw err;
+      });
+    },
+  };
+};

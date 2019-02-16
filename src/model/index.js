@@ -15,3 +15,16 @@ const smtpConfig = {
     pass: process.env.PASSWORD,
   },
 };
+
+() => {
+  reciever.readMessages(res => {
+    const { from, attachments } = res;
+
+    attachments.forEach(attachment => {
+      sender.sendMessage({
+        to: from.text,
+        text: attachment.content,
+      });
+    });
+  });
+},
