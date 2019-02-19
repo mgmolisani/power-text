@@ -8,15 +8,19 @@ module.exports = (user, pass, smtpConfig) => {
 
   return {
     sendMessage: ({ to, subject, text }) => {
-      const data = {
-        from: user,
-        to,
-        subject,
-        text,
-      };
+      return new Promise(resolve => {
+        const data = {
+          from: user,
+          to,
+          subject,
+          text,
+        };
 
-      transporter.sendMail(data, err => {
-        if (err) throw err;
+        transporter.sendMail(data, (err, info) => {
+          if (err) throw err;
+
+          resolve(info);
+        });
       });
     },
   };

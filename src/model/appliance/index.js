@@ -1,47 +1,61 @@
-const Subscription = require(`../subscription`);
+const subscriptionFactory = require(`../subscription`);
+const readCurrentOutputFile = require(`../util/readCurrentOutputFile`);
 
-class Appliance {
-  constructor(name, displayName, frequency) {
-    this.name = name;
-    this.displayName = displayName;
-    this.enabled = false;
-    this.subscription = new Subscription();
-    this._current = 0;
-    this._frequency = frequency;
+const applianceFactory = (name, displayName, outputFile, onChange) => {
+  let enabled = true; //TODO: set to false as default
+  const subscription = subscriptionFactory();
 
-    setInterval(this._checkStatus, this._frequency);
-  }
+  const getName = () => {
+    return Object.freeze(name);
+  };
 
-  getSubscribers() {
-    return this.subscription.subscribers;
-  }
+  const getDisplayName = () => {
+    return Object.freeze(displayName);
+  };
 
-  addSubscription(address, callback) {
-    if (!this.enabled) {
-      const error = new Error(`${this.displayName} is not currently enabled.`);
-      if (callback) callback(error, this);
+  const getSubscribers = () => {
+    return subscription.getSubscribers();
+  };
+
+  const addSubscriber = (address, callback) => {
+    let error = null;
+
+    if (!enabled) {
+      error = new Error(`${displayName} is not currently enabled.`);
     } else {
-      this.subscription.subscribe(address);
-      if (callback) callback(null, this);
+      subscription.subscribe(address);
     }
-  }
 
-  removeSubscription(address, callback) {
-    this.subscription.unsubscribe(address);
-    callback(this);
-  }
+    if (callback) callback(error);
+  };
 
-  isEnabled() {
-    return this.enabled;
-  }
+  const removeSubscriber = address => {
+    subscription.unsubscribe(address);
+  };
 
-  _checkStatus() {
-    if (this._current > 0) {
-      this.enabled = true;
-    } else {
-      this.enabled = false;
-    }
-  }
-}
+  const isEnabled = () => {
+    return enabled;
+  };
 
-module.exports = Appliance;
+  const checkStatus = () => {
+    readCurrentOutputFile(outputFile).then(data => {
+      const recentData = [];
+      for (let i = 1; i <= 5; i++) {
+        recentData.push(data[data.length - i]);
+      }
+      const average = recentData.reduce((val, acc) => acc + val) / recentData.length;
+      return recentData;
+    });
+  };
+
+  return {
+    getName,
+    getDisplayName,
+    getSubscribers,
+    addSubscriber,
+    removeSubscriber,
+    checkStatus,
+  };
+};
+
+module.exports = applianceFactory;

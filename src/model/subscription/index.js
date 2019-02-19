@@ -1,15 +1,21 @@
-class Subscription {
-  constructor() {
-    this.subscribers = new Set();
-  }
+module.exports = () => {
+  const subscribers = new Set();
 
-  subscribe(address) {
-    this.subscribers.add(address);
-  }
+  const getSubscribers = () => {
+    return Object.freeze(subscribers);
+  };
 
-  unsubscribe(address) {
-    this.subscribers.delete(address);
-  }
-}
+  const subscribe = address => {
+    subscribers.add(address);
+  };
 
-module.exports = Subscription;
+  const unsubscribe = address => {
+    subscribers.delete(address);
+  };
+
+  return {
+    getSubscribers,
+    subscribe,
+    unsubscribe,
+  };
+};

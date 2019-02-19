@@ -14,7 +14,6 @@
   "rules": {
     "quotes": ["error", "backtick"],
     "no-var": "error",
-    "no-console": "warn",
-    "max-len": ["warn", 80]
+    "no-console": "warn"
   }
 }
