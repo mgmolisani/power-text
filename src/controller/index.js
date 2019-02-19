@@ -20,18 +20,42 @@ const model = require(`../model`)(
 );
 
 let i = 0;
-const interval = setInterval(() => {
+setInterval(() => {
   i++;
-  fs.appendFile(`test.txt`, `${0}\n`, function(err) {
+  fs.appendFile(`test.txt`, `${i % 1000 >= 500 ? 20 : 1}\n`, function(err) {
     if (err) throw err;
   });
-  if (i === 101) {
-    clearInterval(interval);
-  }
 }, 10);
 
-model.addAppliance(`LG1`, `Mike's Dryer`, `test.txt`);
-model.addAppliance(`WM1`, `Mike's Washer`, `test.txt`);
+const onStatusChange = appliance => {
+  const name = appliance.getName();
+  const displayName = appliance.getDisplayName();
+  appliance.getSubscribers().forEach(subscriber => {
+    const email = {
+      to: subscriber,
+      subject: ``,
+      text: ``,
+    };
+    if (appliance.isEnabled) {
+      email.subject = `${displayName} has turned on!`;
+      email.text =
+        `You are receiving this message because you have subscribed to updates from ${displayName} ` +
+        `To unsubscribe, respond with "${name}".`;
+    } else {
+      email.subject = `${displayName} has turned off!`;
+      email.text =
+        `You are receiving this message because you have subscribed to updates from ${displayName} ` +
+        `You will now be unsubscribed from ${displayName}. ` +
+        `To resubscribe, respond with "${name}".`;
+    }
+
+    model.sendMessage(email)
+        .catch(err => console.log(err));
+  });
+};
+
+model.addAppliance(`LG1`, `Mike's Dryer`, `test.txt`, onStatusChange);
+model.addAppliance(`WM1`, `Mike's Washer`, `test.txt`, onStatusChange);
 
 const toggleSubscription = (address, appliance) => {
   const hasSubscriber = appliance.getSubscribers().has(address);
@@ -66,9 +90,13 @@ const onMessageRead = msg => {
 
       if (subscribed) {
         email.subject = `You have subscribed to updates for ${displayName}!`;
-        email.text = `To unsubscribe, respond with "${name}".`;
+        email.text =
+          `To unsubscribe, respond with "${name}". ` +
+          `You will automatically be unsubscribed the next time ${displayName} turns off.`;
       } else {
-        email.subject = `You have unsubscribed from updates for ${displayName}!`;
+        email.subject =
+          `You have unsubscribed from updates for ${displayName}! ` +
+          `To resubscribe, respond with "${name}".`;
       }
     } else {
       const applianceListString = appliances
@@ -83,14 +111,20 @@ const onMessageRead = msg => {
         `${applianceListString}`;
     }
 
-    model.sendMessage(email);
+    model.sendMessage(email).catch(err => {
+      console.log(err);
+      onMessageRead(msg);
+    });
   });
 };
 
 const run = () =>
-  model.readMessages(onMessageRead).finally(() => {
-    setTimeout(() => run(), 1000);
-  });
+  model
+    .readMessages(onMessageRead)
+    .catch(err => console.log(err))
+    .finally(() => {
+      setTimeout(() => run(), 1000);
+    });
 
 module.exports = {
   run,

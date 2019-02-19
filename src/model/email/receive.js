@@ -4,7 +4,7 @@ const parser = require(`mailparser`).simpleParser;
 module.exports = (user, password, imapConfig) => {
   return {
     readMessages: onMessageRead => {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         const imap = new Imap({ user, password, ...imapConfig });
 
         const onReady = () => {
@@ -14,7 +14,7 @@ module.exports = (user, password, imapConfig) => {
         };
 
         const onError = err => {
-          console.log(err);
+          reject(err);
         };
 
         const onEnd = () => {
@@ -51,10 +51,6 @@ module.exports = (user, password, imapConfig) => {
               stream.on(`data`, onData);
               stream.once(`end`, onEnd);
             });
-          };
-
-          const onError = err => {
-            console.log(`Fetch error: ${err}`);
           };
 
           const onEnd = () => {

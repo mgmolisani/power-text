@@ -4,8 +4,9 @@ const currentIsAmbient = require(`../util/currentIsAmbient`);
 const calculateCurrentBaseline = require(`../util/calculateCurrentBaseline`);
 
 const applianceFactory = (name, displayName, outputFile, onChange) => {
+  const self = {};
   let baseline = null;
-  let enabled = true; //TODO: set to false as default
+  let enabled = false;
   const subscription = subscriptionFactory();
 
   const readCurrent = () => readCurrentOutputFile(outputFile);
@@ -46,7 +47,7 @@ const applianceFactory = (name, displayName, outputFile, onChange) => {
   setInterval(() => {
     if (baseline === null) {
       checkForData(100)
-        .then(calculateCurrentBaseline)
+        .then(data => calculateCurrentBaseline(data.splice(0, 100)))
         .then(res => (baseline = res));
     }
     checkForData(5).then(data => {
@@ -60,20 +61,20 @@ const applianceFactory = (name, displayName, outputFile, onChange) => {
       if ((ambientFlag && enabled) || !(ambientFlag || enabled)) {
         enabled = !enabled;
         if (onChange) {
-          onChange(enabled);
+          onChange(self);
         }
       }
     });
-  }, 1000);
+  }, 50);
 
-  return {
-    getName,
-    getDisplayName,
-    getSubscribers,
-    addSubscriber,
-    removeSubscriber,
-    isEnabled,
-  };
+  self.getName = getName;
+  self.getDisplayName = getDisplayName;
+  self.getSubscribers = getSubscribers;
+  self.addSubscriber = addSubscriber;
+  self.removeSubscriber = removeSubscriber;
+  self.isEnabled = isEnabled;
+
+  return self;
 };
 
 module.exports = applianceFactory;
