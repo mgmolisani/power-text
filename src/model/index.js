@@ -1,19 +1,31 @@
-const applianceFactory = require(`../model/appliance`);
+const emailService = require(`./email`);
+const applianceFactory = require(`./appliance`);
 
-const dryer = applianceFactory(
-  `LG1`,
-  `Mike's Dryer`,
-  `/Users/mgmolisani/Documents/projects/iot/power-text/test.txt`
-);
+module.exports = (user, password, receiveConfig, sendConfig) => {
+  const email = emailService(user, password, receiveConfig, sendConfig);
+  const { readMessages, sendMessage } = email;
+  const appliances = new Map();
 
-const washer = applianceFactory(
-  `WM1`,
-  `Mike's Washer`,
-  `/Users/mgmolisani/Documents/projects/iot/power-text/test.txt`
-);
+  const addAppliance = (name, displayName, outputFile, onChange) => {
+    appliances.set(
+      name,
+      applianceFactory(name, displayName, outputFile, onChange)
+    );
+  };
 
-const appliances = [dryer, washer];
+  const removeAppliance = applianceName => {
+    appliances.delete(applianceName);
+  };
 
-module.exports = {
-  appliances,
+  const getAppliances = () => {
+    return appliances;
+  };
+
+  return {
+    getAppliances,
+    addAppliance,
+    removeAppliance,
+    readMessages,
+    sendMessage,
+  };
 };

@@ -1,3 +1,5 @@
+const fs = require(`fs`);
+
 const imapConfig = {
   host: process.env.IMAP_HOST, // `_imap.gmail.com`
   port: parseInt(process.env.IMAP_PORT), // 993
@@ -10,25 +12,35 @@ const smtpConfig = {
   secure: process.env.SMTP_TLS === `true`, // true
 };
 
-const emailService = require(`../model/email`)(
+const model = require(`../model`)(
   process.env.EMAIL,
   process.env.PASSWORD,
   imapConfig,
   smtpConfig
 );
 
-const { appliances } = require(`../model`);
+let i = 0;
+const interval = setInterval(() => {
+  i++;
+  fs.appendFile(`test.txt`, `${0}\n`, function(err) {
+    if (err) throw err;
+  });
+  if (i === 101) {
+    clearInterval(interval);
+  }
+}, 10);
+
+model.addAppliance(`LG1`, `Mike's Dryer`, `test.txt`);
+model.addAppliance(`WM1`, `Mike's Washer`, `test.txt`);
 
 const toggleSubscription = (address, appliance) => {
-  if (appliance.getSubscribers().has(address)) {
+  const hasSubscriber = appliance.getSubscribers().has(address);
+  if (hasSubscriber) {
     appliance.removeSubscriber(address);
-    return false;
   } else {
-    appliance.addSubscriber(address, err => {
-      if (err) throw err;
-    });
-    return true;
+    appliance.addSubscriber(address);
   }
+  return !hasSubscriber;
 };
 
 const onMessageRead = msg => {
@@ -37,18 +49,16 @@ const onMessageRead = msg => {
 
   attachments.forEach(attachment => {
     const content = attachment.content.toString(`utf8`);
-    const applianceIndex = appliances.findIndex(
-      appliance =>
-        appliance.getName().toLowerCase() === content.toLowerCase().trim()
-    );
     const email = {
       to,
       subject: ``,
       text: ``,
     };
 
-    if (applianceIndex !== -1) {
-      const appliance = appliances[applianceIndex];
+    const appliances = model.getAppliances();
+    const appliance = appliances.get(content.toUpperCase().trim());
+
+    if (appliance) {
       const name = appliance.getName();
       const displayName = appliance.getDisplayName();
 
@@ -73,12 +83,12 @@ const onMessageRead = msg => {
         `${applianceListString}`;
     }
 
-    emailService.sendMessage(email);
+    model.sendMessage(email);
   });
 };
 
 const run = () =>
-  emailService.readMessages(onMessageRead).finally(() => {
+  model.readMessages(onMessageRead).finally(() => {
     setTimeout(() => run(), 1000);
   });
 

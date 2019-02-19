@@ -18,7 +18,6 @@ module.exports = (user, pass, smtpConfig) => {
 
         transporter.sendMail(data, (err, info) => {
           if (err) throw err;
-
           resolve(info);
         });
       });

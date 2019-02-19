@@ -2,7 +2,7 @@ module.exports = () => {
   const subscribers = new Set();
 
   const getSubscribers = () => {
-    return Object.freeze(subscribers);
+    return subscribers;
   };
 
   const subscribe = address => {
