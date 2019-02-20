@@ -1,7 +1,7 @@
 const fs = require(`fs`);
 const readline = require(`readline`);
 
-module.exports = path => {
+module.exports = (path, parser = parseFloat) => {
   return new Promise(resolve => {
     const lines = [];
 
@@ -11,7 +11,7 @@ module.exports = path => {
     });
 
     rl.on(`line`, line => {
-      lines.push(parseFloat(line));
+      lines.push(parser(line));
     });
 
     rl.once(`close`, () => {

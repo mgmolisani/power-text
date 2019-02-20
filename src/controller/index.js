@@ -12,7 +12,8 @@ const smtpConfig = {
   secure: process.env.SMTP_TLS === `true`, // true
 };
 
-const model = require(`../model`)(
+const model = require(`../model`)();
+const view = require(`../view`)(
   process.env.EMAIL,
   process.env.PASSWORD,
   imapConfig,
@@ -36,21 +37,21 @@ const onStatusChange = appliance => {
       subject: ``,
       text: ``,
     };
-    if (appliance.isEnabled) {
+    if (appliance.isEnabled()) {
       email.subject = `${displayName} has turned on!`;
       email.text =
-        `You are receiving this message because you have subscribed to updates from ${displayName} ` +
+        `You are receiving this message because you have subscribed to updates from ${displayName}. ` +
         `To unsubscribe, respond with "${name}".`;
     } else {
+      appliance.removeSubscriber(subscriber);
       email.subject = `${displayName} has turned off!`;
       email.text =
-        `You are receiving this message because you have subscribed to updates from ${displayName} ` +
+        `You are receiving this message because you have subscribed to updates from ${displayName}. ` +
         `You will now be unsubscribed from ${displayName}. ` +
         `To resubscribe, respond with "${name}".`;
     }
 
-    model.sendMessage(email)
-        .catch(err => console.log(err));
+    view.sendMessage(email).catch(err => console.log(err));
   });
 };
 
@@ -91,6 +92,9 @@ const onMessageRead = msg => {
       if (subscribed) {
         email.subject = `You have subscribed to updates for ${displayName}!`;
         email.text =
+          `${displayName} is currently ${
+            appliance.isEnabled() ? `on` : `off.`
+          }\n` +
           `To unsubscribe, respond with "${name}". ` +
           `You will automatically be unsubscribed the next time ${displayName} turns off.`;
       } else {
@@ -107,23 +111,27 @@ const onMessageRead = msg => {
 
       email.subject = `${content} is not a valid choice`;
       email.text =
-        `Please respond with one of the following:\n\n` +
+        `Please respond with one of the following:\n` +
         `${applianceListString}`;
     }
 
-    model.sendMessage(email).catch(err => {
+    let errCount = 0;
+    view.sendMessage(email).catch(err => {
       console.log(err);
-      onMessageRead(msg);
+      errCount++;
+      if (errCount >= 10) {
+        onMessageRead(msg);
+      }
     });
   });
 };
 
 const run = () =>
-  model
+  view
     .readMessages(onMessageRead)
     .catch(err => console.log(err))
     .finally(() => {
-      setTimeout(() => run(), 1000);
+      setTimeout(run, 1000);
     });
 
 module.exports = {

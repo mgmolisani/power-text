@@ -1,5 +1,5 @@
-const recieveService = require(`./receive`);
-const sendService = require(`./send`);
+const recieveService = require(`./email/receive`);
+const sendService = require(`./email/send`);
 
 module.exports = (email, password, receiveConfig, sendConfig) => {
   const receiver = recieveService(email, password, receiveConfig);

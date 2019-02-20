@@ -9,12 +9,12 @@ const applianceFactory = (name, displayName, outputFile, onChange) => {
   let enabled = false;
   const subscription = subscriptionFactory();
 
-  const readCurrent = () => readCurrentOutputFile(outputFile);
+  const readCurrent = () => readCurrentOutputFile(outputFile /*TODO: parser*/);
 
   const checkForData = minPoints => {
     return readCurrent().then(data => {
       if (data.length < minPoints) {
-        checkForData();
+        return checkForData();
       }
       return data;
     });
@@ -44,28 +44,36 @@ const applianceFactory = (name, displayName, outputFile, onChange) => {
     return enabled;
   };
 
-  setInterval(() => {
-    if (baseline === null) {
-      checkForData(100)
-        .then(data => calculateCurrentBaseline(data.splice(0, 100)))
-        .then(res => (baseline = res));
-    }
-    checkForData(5).then(data => {
-      const recentData = [];
+  const readBaseline = () => {
+    return checkForData(100)
+      .then(data => calculateCurrentBaseline(data.splice(0, 100)))
+      .then(res => (baseline = res));
+  };
 
-      for (let i = 1; i <= 5; i++) {
-        recentData.push(data[data.length - i]);
-      }
+  const readData = () => {
+    return checkForData(5).then(data => {
+      const ambientFlag = currentIsAmbient(
+        data.splice(data.length - 5, data.length),
+        baseline
+      );
 
-      const ambientFlag = currentIsAmbient(recentData, baseline);
       if ((ambientFlag && enabled) || !(ambientFlag || enabled)) {
         enabled = !enabled;
+        console.log(`I changed and I am now ${enabled ? `on` : `off`}`);
         if (onChange) {
           onChange(self);
         }
       }
     });
-  }, 50);
+  };
+
+  const update = () => {
+    (baseline === null ? readBaseline() : readData()).finally(() => {
+      setTimeout(update, 100);
+    });
+  };
+
+  update();
 
   self.getName = getName;
   self.getDisplayName = getDisplayName;

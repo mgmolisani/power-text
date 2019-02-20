@@ -1,9 +1,6 @@
-const emailService = require(`./email`);
 const applianceFactory = require(`./appliance`);
 
-module.exports = (user, password, receiveConfig, sendConfig) => {
-  const email = emailService(user, password, receiveConfig, sendConfig);
-  const { readMessages, sendMessage } = email;
+module.exports = () => {
   const appliances = new Map();
 
   const addAppliance = (name, displayName, outputFile, onChange) => {
@@ -25,7 +22,5 @@ module.exports = (user, password, receiveConfig, sendConfig) => {
     getAppliances,
     addAppliance,
     removeAppliance,
-    readMessages,
-    sendMessage,
   };
 };

@@ -4,22 +4,22 @@ const parser = require(`mailparser`).simpleParser;
 module.exports = (user, password, imapConfig) => {
   return {
     readMessages: onMessageRead => {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         const imap = new Imap({ user, password, ...imapConfig });
 
         const onReady = () => {
-          console.log(`Connection successful`);
-          console.log(`Opening inbox`);
+          // console.log(`Connection successful`);
+          // console.log(`Opening inbox`);
           imap.openBox(`INBOX`, onInboxOpen);
         };
 
         const onError = err => {
-          reject(err);
+          throw err;
         };
 
         const onEnd = () => {
-          console.log(`Connection closed`);
-          console.log(`----------------------------------------\n`);
+          // console.log(`Connection closed`);
+          // console.log(`----------------------------------------\n`);
 
           resolve();
         };
@@ -27,11 +27,11 @@ module.exports = (user, password, imapConfig) => {
         const onInboxOpen = err => {
           if (err) throw err;
 
-          console.log(`Fetching new emails`);
+          // console.log(`Fetching new emails`);
 
           let i = 0;
           const onMessage = (msg, index) => {
-            console.log(`Reading message #${index}`);
+            // console.log(`Reading message #${index}`);
             msg.on(`body`, stream => {
               let buffer = ``;
 
@@ -54,17 +54,17 @@ module.exports = (user, password, imapConfig) => {
           };
 
           const onEnd = () => {
-            console.log(`${i} message${i !== 1 ? `s` : ``} read`);
+            // console.log(`${i} message${i !== 1 ? `s` : ``} read`);
 
-            console.log(`Expunging Inbox`);
+            // console.log(`Expunging Inbox`);
             imap.seq.addFlags(`1:*`, `Deleted`, err => {
               if (err) throw err;
 
               imap.closeBox(err => {
                 if (err) throw err;
 
-                console.log(`Expunging complete`);
-                console.log(`Closing connection`);
+                // console.log(`Expunging complete`);
+                // console.log(`Closing connection`);
                 imap.end();
               });
             });
@@ -83,8 +83,8 @@ module.exports = (user, password, imapConfig) => {
         imap.once(`error`, onError);
         imap.once(`end`, onEnd);
 
-        console.log(`----------------------------------------`);
-        console.log(`Connecting to ${user}`);
+        // console.log(`----------------------------------------`);
+        // console.log(`Connecting to ${user}`);
         imap.connect();
       });
     },
