@@ -1,26 +1,16 @@
-const applianceFactory = require(`./appliance`);
+const { bindActionCreators } = require(`redux`);
+const { dispatch, getState } = require(`./store`);
+const { actionCreators } = require(`./actions`);
 
-module.exports = () => {
-  const appliances = new Map();
+const { addAppliance, removeAppliance } = bindActionCreators(
+  actionCreators,
+  dispatch
+);
 
-  const addAppliance = (name, displayName, outputFile, onChange) => {
-    appliances.set(
-      name,
-      applianceFactory(name, displayName, outputFile, onChange)
-    );
-  };
-
-  const removeAppliance = applianceName => {
-    appliances.delete(applianceName);
-  };
-
-  const getAppliances = () => {
-    return appliances;
-  };
-
-  return {
-    getAppliances,
-    addAppliance,
-    removeAppliance,
-  };
+module.exports = {
+  addAppliance,
+  removeAppliance,
+  getAppliances: () => {
+    return getState().appliances;
+  },
 };

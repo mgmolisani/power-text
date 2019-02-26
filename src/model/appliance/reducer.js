@@ -2,25 +2,6 @@ const subscriptionFactory = require(`../subscription`);
 const readCurrentOutputFile = require(`../util/readCurrentOutputFile`);
 const currentIsAmbient = require(`../util/currentIsAmbient`);
 const calculateCurrentBaseline = require(`../util/calculateCurrentBaseline`);
-const { bindActionCreators } = require(`redux`);
-const { dispatch } = require(`../store`);
-const { actionCreators } = require(`./actions`);
-
-const { toggleEnabled, setBaseline } = bindActionCreators(
-  actionCreators,
-  dispatch
-);
-
-module.exports = {
-  toggleEnabled,
-  setBaseline,
-  getDisplayName: (appliances, name) => {
-    return appliances.get(name).displayName;
-  },
-  isEnabled: (appliances, name) => {
-    return appliances.get(name).enabled;
-  },
-};
 
 const applianceFactory = (name, displayName, outputFile, onChange) => {
   const self = {};
@@ -106,8 +87,3 @@ const applianceFactory = (name, displayName, outputFile, onChange) => {
 
 module.exports = applianceFactory;
 
-module.exports = {
-  getSubscribers(appliance) {
-    return appliance.subscribers;
-  },
-};

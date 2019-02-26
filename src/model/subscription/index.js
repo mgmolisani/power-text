@@ -1,21 +1,16 @@
-module.exports = () => {
-  const subscribers = new Set();
+const { bindActionCreators } = require(`redux`);
+const { dispatch } = require(`../store`);
+const { actionCreators } = require(`./actions`);
 
-  const getSubscribers = () => {
-    return subscribers;
-  };
+const { addSubscriber, removeSubscriber } = bindActionCreators(
+  actionCreators,
+  dispatch
+);
 
-  const subscribe = address => {
-    subscribers.add(address);
-  };
-
-  const unsubscribe = address => {
-    subscribers.delete(address);
-  };
-
-  return {
-    getSubscribers,
-    subscribe,
-    unsubscribe,
-  };
+module.exports = {
+  addSubscriber,
+  removeSubscriber,
+  getSubscribers: appliance => {
+    return appliance.subscribers;
+  },
 };

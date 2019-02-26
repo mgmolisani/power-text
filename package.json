@@ -1,18 +1,18 @@
 {
   "name": "power-text",
   "version": "1.0.0",
-  "description": "Text when the power goes off!",
+  "description": "Simple notifier for home appliance state.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "@mgmolisani",
   "dependencies": {
     "imap": "^0.8.19",
     "mailparser": "^2.4.3",
-    "nodemailer": "^5.1.1"
+    "nodemailer": "^5.1.1",
+    "redux": "^4.0.1"
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
