@@ -6,24 +6,24 @@ const actionTypes = {
   REMOVE_APPLIANCE,
 };
 
-const addAppliance = ({ name, displayName, outputFile }) => {
+const addAppliance = ({ id, displayName, outputFile }) => {
   const appliance = {
-    name,
+    id,
     displayName,
     outputFile,
   };
 
   return {
     type: ADD_APPLIANCE,
-    name,
+    id,
     appliance,
   };
 };
 
-const removeAppliance = name => {
+const removeAppliance = id => {
   return {
     type: REMOVE_APPLIANCE,
-    name,
+    id,
   };
 };
 
