@@ -15,15 +15,16 @@ const addAppliance = ({ id, displayName, outputFile }) => {
 
   return {
     type: ADD_APPLIANCE,
-    id,
-    appliance,
+    payload: {
+      [id]: appliance,
+    },
   };
 };
 
 const removeAppliance = id => {
   return {
     type: REMOVE_APPLIANCE,
-    id,
+    payload: id,
   };
 };
 

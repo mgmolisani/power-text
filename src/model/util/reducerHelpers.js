@@ -1,13 +1,13 @@
-const setProperty = (object, key, value) => {
+const setProperty = (prevObject, entry) => {
   return {
-    ...object,
-    [key]: value,
+    ...prevObject,
+    ...entry,
   };
 };
 
-const deleteProperty = (object, key) => {
+const deleteProperty = (prevObject, key) => {
   const newObject = {
-    ...object,
+    ...prevObject,
   };
   delete newObject[key];
   return newObject;

@@ -6,17 +6,17 @@ const actionTypes = {
   SET_BASELINE,
 };
 
-const toggleEnabled = name => {
+const toggleEnabled = id => {
   return {
     type: TOGGLE_ENABLED,
-    name,
+    id,
   };
 };
 
-const setBaseline = (name, baseline) => {
+const setBaseline = (id, baseline) => {
   return {
     type: TOGGLE_ENABLED,
-    name,
+    id,
     baseline,
   };
 };

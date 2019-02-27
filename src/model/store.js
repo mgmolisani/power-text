@@ -1,4 +1,4 @@
-const { createStore, combineReducers } = require(`redux`);
-const appliances = require(`./reducer`);
+const { createStore } = require(`redux`);
+const rootReducer = require(`./reducer`);
 
-module.exports = createStore(combineReducers({ appliances }));
+module.exports = createStore(rootReducer);

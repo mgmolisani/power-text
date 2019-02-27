@@ -1,10 +1,20 @@
 require(`dotenv`).config();
 
+const { getState } = require(`./src/model/store`);
+
 const app = require(`./src/controller`);
 
 //app.run();
 
-const { addAppliance, getAppliances } = require(`./src/model`);
+const {
+  addAppliance,
+  removeAppliance,
+  getAppliances,
+  addSubscription,
+  removeSubscription,
+  getSubscribersForAppliance,
+  getAppliancesForSubscriber,
+} = require(`./src/model`);
 
 const dryer = {
   id: `MD1`,
@@ -21,4 +31,18 @@ const washer = {
 addAppliance(dryer);
 addAppliance(washer);
 
+addSubscription({ applianceId: `WM1`, address: `abc@123.com` });
+// addSubscription({ applianceId: `WM1`, address: `xyz@123.com` });
+// addSubscription({ applianceId: `MD1`, address: `xyz@123.com` });
+
 console.log(getAppliances());
+console.log(getSubscribersForAppliance(`WM1`));
+// console.log(getAppliancesForSubscriber(`xyz@123.com`));
+
+removeAppliance(`WM1`);
+
+// removeSubscription({ applianceId: `WM1`, address: `xyz@123.com` });
+
+console.log(getAppliances());
+console.log(getSubscribersForAppliance(`WM1`));
+// console.log(getAppliancesForSubscriber(`xyz@123.com`));

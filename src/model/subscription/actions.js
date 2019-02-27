@@ -1,28 +1,39 @@
-const ADD_SUBSCRIBER = `ADD_SUBSCRIBER`;
-const REMOVE_SUBSCRIBER = `REMOVE_SUBSCRIBER`;
+const ADD_SUBSCRIPTION = `ADD_SUBSCRIPTION`;
+const REMOVE_SUBSCRIPTION = `REMOVE_SUBSCRIPTION`;
 
 const actionTypes = {
-  ADD_SUBSCRIBER,
-  REMOVE_SUBSCRIBER,
+  ADD_SUBSCRIPTION,
+  REMOVE_SUBSCRIPTION,
 };
 
-const addSubscriber = address => {
+const keyGenerator = ({ applianceId, address }) => {
+  return `${applianceId}_${address}`;
+};
+
+const addSubscription = ({ applianceId, address }) => {
+  const id = keyGenerator({ applianceId, address });
   return {
-    type: ADD_SUBSCRIBER,
-    address,
+    type: ADD_SUBSCRIPTION,
+    payload: {
+      [id]: {
+        id,
+        applianceId,
+        address,
+      },
+    },
   };
 };
 
-const removeSubscriber = address => {
+const removeSubscription = ({ applianceId, address }) => {
   return {
-    type: REMOVE_SUBSCRIBER,
-    address,
+    type: REMOVE_SUBSCRIPTION,
+    payload: keyGenerator({ applianceId, address }),
   };
 };
 
 const actionCreators = {
-  addSubscriber,
-  removeSubscriber,
+  addSubscription,
+  removeSubscription,
 };
 
 module.exports = {
